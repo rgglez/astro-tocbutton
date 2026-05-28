@@ -1,0 +1,152 @@
+---
+/*
+ * Copyright 2026 Rodolfo González González
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import IconMenuDeep from "./icons/IconMenuDeep.svg";
+
+interface Props {
+  label?: string;
+  position?: "bottom-left" | "bottom-right" | "top-left" | "top-right";
+}
+
+const { label, position = "bottom-left" } = Astro.props;
+
+// Full static class strings so Tailwind's JIT can detect them.
+// Logical start/end (instead of physical left/right) so placement mirrors
+// automatically under dir="rtl": "left" maps to the inline-start edge.
+const containerPosition = {
+  "bottom-left": "bottom-8 start-4",
+  "bottom-right": "bottom-8 end-4",
+  "top-left": "top-8 start-4",
+  "top-right": "top-8 end-4",
+}[position];
+
+// Popover anchors to the button: opens up for bottom-*, down for top-*,
+// and aligns to the same horizontal edge.
+const popoverPosition = {
+  "bottom-left": "bottom-16 start-0",
+  "bottom-right": "bottom-16 end-0",
+  "top-left": "top-16 start-0",
+  "top-right": "top-16 end-0",
+}[position];
+
+---
+
+<div id="toc-btn-container" class:list={["fixed z-50", containerPosition]}>
+  <button
+    id="toc-btn"
+    aria-label={label || "Table of contents"}
+    aria-expanded="false"
+    aria-controls="toc-popover"
+    class:list={[
+      "group relative bg-background px-2 py-1",
+      "size-14 rounded-full shadow-xl",
+      "hover:text-accent focus-visible:outline-2 focus-visible:outline-dashed focus-visible:outline-accent",
+    ]}
+  >
+    <IconMenuDeep class="inline-block" />
+  </button>
+
+  <div
+    id="toc-popover"
+    role="dialog"
+    aria-label="Table of contents"
+    class:list={[
+      "absolute",
+      popoverPosition,
+      "w-[min(20rem,calc(100vw-2rem))] max-h-[60vh]",
+      "overflow-y-auto rounded-xl border border-border shadow-2xl",
+      "bg-background/90 backdrop-blur-lg",
+      "transition-all duration-200",
+      "opacity-0 translate-y-2 pointer-events-none",
+    ]}
+  >
+    <nav id="toc-nav" class="p-3 text-sm"></nav>
+  </div>
+</div>
+
+<script is:inline data-astro-rerun>
+  function tocButton() {
+    const container = document.getElementById("toc-btn-container");
+    const btn       = document.getElementById("toc-btn");
+    const popover   = document.getElementById("toc-popover");
+    const nav       = document.getElementById("toc-nav");
+
+    if (!container || !btn || !popover || !nav) return;
+    if (container.dataset.tocInit) return;
+    container.dataset.tocInit = "1";
+
+    // Build TOC from article headings
+    const headings = Array.from(
+      document.querySelectorAll("#article h2, #article h3, #article h4, #article h5, #article h6")
+    ).filter(h => h.id);
+
+    if (!headings.length) {
+      container.style.display = "none";
+      return;
+    }
+
+    const indentMap = { H2: "", H3: "pl-4", H4: "pl-8", H5: "pl-10", H6: "pl-12" };
+
+    nav.innerHTML = headings.map(h => {
+      const indent = indentMap[h.tagName] ?? "";
+      const text   = h.textContent?.replace(/#\s*$/, "").trim() ?? "";
+      return `<a
+        href="#${h.id}"
+        class="toc-link block ${indent} py-1 leading-snug text-foreground/80 hover:text-accent truncate"
+        data-toc-target="${h.id}"
+      >${text}</a>`;
+    }).join("");
+
+    // Open/close helpers
+    function open() {
+      popover.classList.remove("opacity-0", "translate-y-2", "pointer-events-none");
+      popover.classList.add("opacity-100", "translate-y-0");
+      btn.setAttribute("aria-expanded", "true");
+    }
+
+    function close() {
+      popover.classList.add("opacity-0", "translate-y-2", "pointer-events-none");
+      popover.classList.remove("opacity-100", "translate-y-0");
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    function isOpen() {
+      return btn.getAttribute("aria-expanded") === "true";
+    }
+
+    btn.addEventListener("click", () => isOpen() ? close() : open());
+
+    // Close on link click
+    nav.addEventListener("click", e => {
+      const link = e.target.closest(".toc-link");
+      if (!link) return;
+      close();
+    });
+
+    // Close on Escape
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && isOpen()) close();
+    });
+
+    // Close on click outside
+    document.addEventListener("click", e => {
+      if (!isOpen()) return;
+      if (!container.contains(e.target)) close();
+    });
+  }
+  tocButton();
+</script>

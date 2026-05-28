@@ -1,0 +1,33 @@
+{
+  "name": "@rgglez/astro-tocbutton",
+  "version": "0.1.0",
+  "description": "Floating TOC button for Astro blog posts. Reads h2–h6 headings from #article and renders a popover with navigation links. Requires Tailwind CSS.",
+  "type": "module",
+  "exports": {
+    ".": "./src/TocButton.astro"
+  },
+  "files": [
+    "src"
+  ],
+  "keywords": [
+    "astro",
+    "astro-component",
+    "toc",
+    "table-of-contents",
+    "tailwind"
+  ],
+  "author": "Rodolfo González González",
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "astro": ">=5.7.0",
+    "tailwindcss": ">=3.3.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "astro": "^5.7.0"
+  }
+}

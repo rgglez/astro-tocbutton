@@ -89,6 +89,14 @@ const popoverPosition = {
     if (container.dataset.tocInit) return;
     container.dataset.tocInit = "1";
 
+    // Reparent to <body> so position:fixed anchors to the viewport.
+    // A transform / filter / contain on any ancestor would otherwise become
+    // the containing block, pinning the button to the content area instead
+    // of the screen edge (and pushing the popover off-screen).
+    if (container.parentElement !== document.body) {
+      document.body.appendChild(container);
+    }
+
     // Build TOC from article headings
     const headings = Array.from(
       document.querySelectorAll("#article h2, #article h3, #article h4, #article h5, #article h6")

@@ -35,13 +35,14 @@ const containerPosition = {
 }[position];
 
 // Popover anchors to the button: opens up for bottom-*, down for top-*,
-// and aligns to the same horizontal edge.
-const popoverPosition = {
-  "bottom-left": "bottom-16 start-0",
-  "bottom-right": "bottom-16 end-0",
-  "top-left": "top-16 start-0",
-  "top-right": "top-16 end-0",
-}[position];
+// aligned to the same horizontal edge. Offsets go in an inline style so the
+// direction can't be lost to Tailwind purging or specificity conflicts.
+const isTop = position.startsWith("top");
+const isLeft = position.endsWith("left");
+const popoverStyle = [
+  `${isTop ? "top" : "bottom"}: 4rem`,
+  `inset-inline-${isLeft ? "start" : "end"}: 0`,
+].join("; ");
 
 ---
 
@@ -64,9 +65,9 @@ const popoverPosition = {
     id="toc-popover"
     role="dialog"
     aria-label="Table of contents"
+    style={popoverStyle}
     class:list={[
       "absolute",
-      popoverPosition,
       "w-[min(20rem,calc(100vw-2rem))] max-h-[60vh]",
       "overflow-y-auto rounded-xl border border-border shadow-2xl",
       "bg-background/90 backdrop-blur-lg",

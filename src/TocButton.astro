@@ -42,6 +42,9 @@ const isLeft = position.endsWith("left");
 const popoverStyle = [
   `${isTop ? "top" : "bottom"}: 4rem`,
   `inset-inline-${isLeft ? "start" : "end"}: 0`,
+  "width: min(20rem, calc(100vw - 2rem))",
+  "max-height: 60vh",
+  "overflow-y: auto",
 ].join("; ");
 
 ---
@@ -68,8 +71,7 @@ const popoverStyle = [
     style={popoverStyle}
     class:list={[
       "absolute",
-      "w-[min(20rem,calc(100vw-2rem))] max-h-[60vh]",
-      "overflow-y-auto rounded-xl border border-border shadow-2xl",
+      "rounded-xl border border-border shadow-2xl",
       "bg-background/90 backdrop-blur-lg",
       "transition-all duration-200",
       "opacity-0 translate-y-2 pointer-events-none",

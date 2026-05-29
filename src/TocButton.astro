@@ -74,7 +74,7 @@ const popoverStyle = [
       "rounded-xl border border-border shadow-2xl",
       "bg-background/90 backdrop-blur-lg",
       "transition-all duration-200",
-      "opacity-0 translate-y-2 pointer-events-none",
+      "opacity-0 translate-y-2 pointer-events-none invisible",
     ]}
   >
     <nav id="toc-nav" class="p-3 text-sm"></nav>
@@ -124,13 +124,13 @@ const popoverStyle = [
 
     // Open/close helpers
     function open() {
-      popover.classList.remove("opacity-0", "translate-y-2", "pointer-events-none");
+      popover.classList.remove("opacity-0", "translate-y-2", "pointer-events-none", "invisible");
       popover.classList.add("opacity-100", "translate-y-0");
       btn.setAttribute("aria-expanded", "true");
     }
 
     function close() {
-      popover.classList.add("opacity-0", "translate-y-2", "pointer-events-none");
+      popover.classList.add("opacity-0", "translate-y-2", "pointer-events-none", "invisible");
       popover.classList.remove("opacity-100", "translate-y-0");
       btn.setAttribute("aria-expanded", "false");
     }
